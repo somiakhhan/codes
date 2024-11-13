@@ -3,14 +3,14 @@ import java.util.Objects;
 public class ArrayStringBoundedList implements StringBoundedList {
     private final String[] elements;
     private int size;
-	
-	@SuppressWarnings("unchecked")
+
     public ArrayStringBoundedList(int capacity) {
         if (capacity < 0) {
             throw new IllegalArgumentException("Capacity cannot be negative.");
         }
         elements = new String[capacity];
-}
+        size = 0;
+    }
 
     @Override
     public int capacity() {
@@ -32,6 +32,44 @@ public class ArrayStringBoundedList implements StringBoundedList {
     }
 
     @Override
+    public void add(int index, String s) {
+        if (isFull()) {
+            throw new IllegalStateException("List is full");
+        }
+        if (index < 0 || index > size) {
+            throw new IndexOutOfBoundsException("Invalid index");
+        }
+        for (int i = size; i > index; i--) {
+            elements[i] = elements[i - 1];
+        }
+        elements[index] = s;
+        size++;
+    }
+
+    @Override
+public String remove(int index) {
+    Objects.checkIndex(index, size);
+        String result = elements[index];
+
+        for(int i = index; i < size - 1; i++) {
+            elements[i] = elements[i + 1];
+           }
+           size--;
+            return result;
+        }
+
+
+    @Override
+    public boolean remove(String s) {
+        int index = indexOf(s);
+        if (index < 0) {
+            return false;
+        }
+        remove(index);
+        return true;
+    }
+
+    @Override
     public String get(int index) {
         if (index < 0 || index >= size) {
             throw new IndexOutOfBoundsException("Invalid index");
@@ -48,7 +86,8 @@ public class ArrayStringBoundedList implements StringBoundedList {
         elements[index] = element;
         return previousElement;
     }
-@Override
+
+    @Override
     public int indexOf(String s) {
         for (int i = 0; i < size; i++) {
             if (Objects.equals(elements[i], s)) {
@@ -70,7 +109,47 @@ public class ArrayStringBoundedList implements StringBoundedList {
 
     @Override
     public void clear() {
+        for (int i = 0; i < size; i++) {
+            elements[i] = null;
+        }
         size = 0;
+    }
+
+    @Override
+    public String getFirst() {
+        if (isEmpty()) {
+            throw new IndexOutOfBoundsException("List is empty");
+        }
+        return get(0);
+    }
+
+    @Override
+    public String setFirst(String element) {
+        if (isEmpty()) {
+            throw new IndexOutOfBoundsException("List is empty");
+        }
+        return set(0, element);
+    }
+
+    @Override
+    public String getLast() {
+        if (isEmpty()) {
+            throw new IndexOutOfBoundsException("List is empty");
+        }
+        return get(size - 1);
+    }
+
+    @Override
+    public String setLast(String element) {
+        if (isEmpty()) {
+            throw new IndexOutOfBoundsException("List is empty");
+        }
+        return set(size - 1, element);
+    }
+
+    @Override
+    public boolean contains(String s) {
+        return indexOf(s) >= 0;
     }
 
     @Override
